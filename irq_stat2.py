@@ -90,7 +90,7 @@ def main():
     ctx_switch_from = {}
     ctx_switch_to = {}
     ctx_switch_rem = {}
-
+    irq_periods = {}
     last_evt = {}
     while not interrupted:
         n += 1
@@ -120,6 +120,9 @@ def main():
             if irq_stack[-1][1] != None:
 #                print("Some stupid problem at %d"%tsc)
                 continue
+            if irqn in last_evt:
+                add_time_stat("%4d" % irqn, irq_periods, tsc - last_evt[irqn])
+            update_last_evt(last_evt, irqn, tsc)
 
             irq_stack[-1][1] = irqn
             if len(irq_stack) > 3:
@@ -171,6 +174,7 @@ def main():
     print_times("CTX Switch From  5-7", ctx_switch_from)
     print_times("CTX Switch To 7-8", ctx_switch_to)
     print_times("CTX Switch Rem 8-9", ctx_switch_rem)
+    print_times("IRQ Periods", irq_periods)
 
 def print_hist(data):
     vals = list(set(data))
@@ -204,7 +208,7 @@ def print_stat(name, data):
 def print_times(name, d):
     print(name)
     gt = []
-    for k in d.keys():
+    for k in sorted(d.keys()):
         print_stat(k, d[k])
         gt += d[k]
     print_stat("(total)", gt)
