@@ -3,6 +3,7 @@ from pcpu_split import next_rec, parse_rec, interrupted
 import signal
 import statistics
 import itertools
+import numpy
 
 TRC_HW_IRQ = 0x00802000
 TRC_AIRQ = (TRC_HW_IRQ + 0x800)
@@ -171,6 +172,20 @@ def main():
     print_times("CTX Switch To 7-8", ctx_switch_to)
     print_times("CTX Switch Rem 8-9", ctx_switch_rem)
 
+def print_hist(data):
+    vals = list(set(data))
+    vals.append(max(vals) + 1)
+
+    if len (vals) < 40:
+        hist = numpy.histogram(data, bins = sorted(vals))
+    else:
+        hist = numpy.histogram(data, bins = 40)
+
+    m = max(hist[0])
+    scale = 120 / m
+    for i in range(len(hist[0])):
+        print ("%12.2f %5d  |%s" %  (hist[1][i], hist[0][i], "*"  *  int(hist[0][i] * scale)))
+
 def print_stat(name, data):
     if len(data) == 0:
         print("%20s ===================== NO DATA ======================"%name)
@@ -184,6 +199,8 @@ def print_stat(name, data):
                                                                      total,
                                                                      len(data),
                                                                      total/(tsc_end - tsc_start) * 100))
+    #print_hist(data)
+
 def print_times(name, d):
     print(name)
     gt = []
