@@ -1,5 +1,5 @@
 #!/bin/env python3
-from vcpu_split import next_rec, parse_rec, interrupted
+from pcpu_split import next_rec, parse_rec, interrupted
 import signal
 
 TRC_HW_IRQ = 0x00802000
